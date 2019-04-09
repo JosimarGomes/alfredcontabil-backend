@@ -1,16 +1,5 @@
 const { ContasBancarias, Movimentacoes } = require('../database/dao');
-const BaseModels = require('./Abstract/BaseModels');
-const Query = require('./SQL/Query');
-
-// ContasBancarias.hasMany(
-//     Movimentacoes,
-//     {
-//         foreignKey: {
-//             name: 'contaBancariaId',
-//             // allowNull: false,
-//         },
-//     },
-// );
+const BaseModels = require('../libs/sequelize-md');
 
 class ContasBancariasModel extends BaseModels {
 
@@ -19,6 +8,7 @@ class ContasBancariasModel extends BaseModels {
         this.objectDao = ContasBancarias;
         this.objectData = objectData;
         this.primaryKey = "id";
+        this.deletedRow = ["deleted", 1];
     }
 
 }

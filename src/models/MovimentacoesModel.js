@@ -1,26 +1,5 @@
 const { Movimentacoes, ContasBancarias, PlanoDeContas } = require('../database/dao');
-const BaseModels = require('./Abstract/BaseModels');
-const Query = require('./SQL/Query');
-
-Movimentacoes.belongsTo(
-    ContasBancarias,
-    {
-        foreignKey: {
-            name: 'contaBancariaId',
-            allowNull: false,
-        },
-    },
-);
-
-Movimentacoes.belongsTo(
-    PlanoDeContas,
-    {
-        foreignKey: {
-            name: 'planoDeContaId',
-            allowNull: false,
-        },
-    },
-);
+const BaseModels = require('../libs/sequelize-md');
  
 class MovimentacoesModel extends BaseModels {
 
@@ -29,6 +8,29 @@ class MovimentacoesModel extends BaseModels {
         this.objectDao = Movimentacoes;
         this.objectData = objectData;
         this.primaryKey = "id";
+        this.associate();
+    }
+
+    associate() {
+        this.objectDao.belongsTo(
+            ContasBancarias,
+            {
+                foreignKey: {
+                    name: 'contaBancariaId',
+                    allowNull: false,
+                },
+            },
+        );
+        
+        this.objectDao.belongsTo(
+            PlanoDeContas,
+            {
+                foreignKey: {
+                    name: 'planoDeContaId',
+                    allowNull: false,
+                },
+            },
+        );
     }
 
     beforeCreate() {
@@ -88,7 +90,6 @@ class MovimentacoesModel extends BaseModels {
 
         return this;
     }
-
 }
 
 module.exports = MovimentacoesModel;
