@@ -19,7 +19,6 @@ class Query {
     }
 
     setWhere(objectWhere) {
-        console.log("objectWhere", objectWhere)
         this.where.push(objectWhere);
         return this;
     }
@@ -62,9 +61,6 @@ class Query {
     }
 
     toSQL() {
-
-        console.log("thisss", this)
-
         const query = {
             offset: this.offSet,
             limit: this.limit,
@@ -89,8 +85,6 @@ class Query {
         if (this.groupBy.length) {
             query.group = this.groupBy;
         }
-
-        console.log("query", query)
 
         return query;
     }
