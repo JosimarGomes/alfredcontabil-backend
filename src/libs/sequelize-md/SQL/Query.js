@@ -31,14 +31,12 @@ class Query {
     setPage(page) {
         const pageNumber = parseInt(page);
         const offSet = pageNumber === 0 ? 0 : pageNumber - 1;
-console.log("pageNumber", pageNumber)
+
         this.offSet = offSet * this.limit || 0;
-        console.log("thisssquery", this)
         return this;
     }
 
     setLimit(limit) {
-        console.log("setlimit",  limit)
         this.limit = parseInt(limit) || 10;
         return this;
     }
@@ -63,7 +61,6 @@ console.log("pageNumber", pageNumber)
     }
 
     toSQL() {
-
         const query = {
             offset: this.offSet,
             limit: this.limit,
@@ -88,8 +85,6 @@ console.log("pageNumber", pageNumber)
         if (this.groupBy.length) {
             query.group = this.groupBy;
         }
-
-        console.log("query", query)
 
         return query;
     }

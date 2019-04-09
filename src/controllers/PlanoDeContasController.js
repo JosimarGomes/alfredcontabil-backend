@@ -13,6 +13,7 @@ exports.index = (req, res) => {
     planoDeContas.search(search)
         .setLimit(limit)
         .setPage(page)
+        .filterActives(true)
         .findAndCountAll()
         .then(data => res.send(data))
         .catch(err => res.status(500).send({ msg: err.message }));

@@ -1,5 +1,6 @@
-const { beginTransaction } = require('../../database/dao');
+const Database = require('../configs');
 const Query = require('../SQL/Query');
+const beginTransaction = () => Database.sequelize.transaction();
 
 class BaseModels {
 
@@ -84,10 +85,15 @@ class BaseModels {
                         throw new Error('Registro não encontrado');
                     }
 
-                    this.objectData = { ...res.dataValues, deleted: 1 };
-
-                    const options = { where: { [this.primaryKey]: this.objectData[this.primaryKey] }, transaction };
-                    const data = await this.objectDao.update(this.objectData, options);
+                    let data = {};
+                    
+                    if (this.hasFlagDeletedRow()) {
+                        this.objectData = { ...res.dataValues, [this.deletedRow[0]]: [this.deletedRow[1]] };
+                        const options = { where: { [this.primaryKey]: this.objectData[this.primaryKey] }, transaction };
+                        data = await this.objectDao.update(this.objectData, options);
+                    } else {
+                        data = await this.objectDao.destroy({ where: { id: res.id, returning: true } })
+                    }
 
                     if (typeof this.afterDelete === 'function') {
                         await this.afterDelete(transaction);
@@ -105,13 +111,6 @@ class BaseModels {
     async findAndCountAll(options = {}) {
 
         try {
-            
-            this.query.setWhere({
-                deleted: {
-                    [this.query.Op.notIn]: 1,
-                },
-            })
-
             return await this.objectDao.findAndCountAll(this.query.toSQL());
         } catch (err) {
             return Promise.reject(err);
@@ -144,6 +143,20 @@ class BaseModels {
     setGroupBy(groupBy) {
         this.query.setGroupBy(groupBy);
         return this;
+    }
+
+    filterActives(flag = false) {
+        if (flag && this.hasFlagDeletedRow())  {
+            this.query.setOrWhere([
+                { [this.deletedRow[0]]: { [this.query.Op.notIn]: [[this.deletedRow[1]]], } },
+                { [this.deletedRow[0]]: { [this.query.Op.eq]: null, } }
+            ]);
+        }
+        return this;
+    }
+
+    hasFlagDeletedRow() {
+        return this.deletedRow && this.deletedRow[0] && this.deletedRow[1];
     }
 }
 
